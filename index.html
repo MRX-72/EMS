@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div class="min-h-screen">
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuButton" class="fixed top-4 left-4 z-50 lg:hidden bg-gray-800 p-2 rounded-lg">
+            <i class="fas fa-bars text-white"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 bg-gray-800 w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40">
+            <div class="flex items-center justify-center h-16 bg-gray-900">
+                <h1 class="text-white text-xl font-bold">EMS Dashboard</h1>
+            </div>
+            <nav class="mt-5">
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700" onclick="showAddEmployeeForm()">
+                    <i class="fas fa-user-plus mr-3"></i>
+                    Add Employee
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700" onclick="showEmployeeList()">
+                    <i class="fas fa-users mr-3"></i>
+                    Employee List
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700" onclick="showBulkUpdateForm()">
+                    <i class="fas fa-users-cog mr-3"></i>
+                    Bulk Update
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700" onclick="exportToCSV()">
+                    <i class="fas fa-file-export mr-3"></i>
+                    Export CSV
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+
+        <!-- Main Content -->
+        <main class="lg:ml-64 p-4 lg:p-8">
+            <!-- Add Employee Form -->
+            <div id="addEmployeeForm" class="bg-gray-800 rounded-lg shadow p-4 lg:p-6 mb-8 hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-white">Add New Employee</h2>
+                <form id="employeeForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-300 mb-2">First Name</label>
+                            <input type="text" id="firstName" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Last Name</label>
+                            <input type="text" id="lastName" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Position</label>
+                            <input type="text" id="position" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Department</label>
+                            <input type="text" id="department" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Status</label>
+                            <select id="status" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full lg:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Add Employee</button>
+                </form>
+            </div>
+
+            <!-- Bulk Update Form -->
+            <div id="bulkUpdateForm" class="bg-gray-800 rounded-lg shadow p-4 lg:p-6 mb-8 hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-white">Bulk Update Status</h2>
+                <form id="bulkUpdateFormElement" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-300 mb-2">Department</label>
+                            <select id="bulkDepartment" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                                <option value="">All Departments</option>
+                                <!-- Departments will be populated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">New Status</label>
+                            <select id="bulkStatus" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full lg:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Update Status</button>
+                </form>
+            </div>
+
+            <!-- Employee List -->
+            <div id="employeeList" class="bg-gray-800 rounded-lg shadow">
+                <div class="p-4 lg:p-6">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4">
+                        <h2 class="text-2xl font-semibold text-white">Employee List</h2>
+                        <div class="flex flex-col lg:flex-row gap-4 w-full lg:w-auto">
+                            <div class="relative w-full lg:w-auto">
+                                <select id="departmentFilter" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white">
+                                    <option value="">All Departments</option>
+                                    <!-- Departments will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="relative w-full lg:w-auto">
+                                <input type="text" id="searchInput" placeholder="Search employees..." class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white">
+                                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto -mx-4 lg:mx-0">
+                        <div class="min-w-full inline-block align-middle">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="bg-gray-700">
+                                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                                        <th class="hidden md:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                                        <th class="hidden md:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Position</th>
+                                        <th class="hidden md:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Department</th>
+                                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employeeTableBody" class="bg-gray-800 divide-y divide-gray-700">
+                                    <!-- Employee rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
